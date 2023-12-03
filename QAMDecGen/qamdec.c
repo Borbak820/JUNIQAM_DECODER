@@ -78,6 +78,7 @@ uint8_t symbol = 0;
 uint8_t checksumGL = 0; // Initialisierung der Checksumme
 uint8_t calculatedChecksum = 0; // Variable für die berechnete Checksumme
 float reconstructedFloat;
+unsigned char byteArray[4];
 
 /*Pointer Init*/
 uint16_t * p_Writing = &ringbuffer[0];
@@ -297,12 +298,43 @@ void vQuamDec(void* pvParameters)
 	}
 }
 
+void getDataTemp(void) {
+	static int pReceivebuffer = 12;
+	static int byteArrayIndex = 0;
+
+    for (int i = 0; i < 16; i++) {
+        switch (receivebuffer[pReceivebuffer]) {
+            case 0:
+                byteArray[byteArrayIndex] |= (0b000 << (i % 4) * 2);
+                break;
+            case 1:
+                byteArray[byteArrayIndex] |= (0b001 << (i % 4) * 2);
+                break;
+            case 2:
+                byteArray[byteArrayIndex] |= (0b010 << (i % 4) * 2);
+                break;
+            case 3:
+                byteArray[byteArrayIndex] |= (0b100 << (i % 4) * 2);
+                break;
+        }
+        pReceivebuffer++;
+
+        // Wenn viermal ins byteArray[0] geschrieben wurde, gehe zum nächsten Element
+        if ((i + 1) % 4 == 0) {
+            byteArrayIndex++;
+        }
+    }
+
+    // Zurücksetzen von pReceivebuffer, wenn es am Ende des receivebuffer angelangt ist
+    if (pReceivebuffer >= sizeof(receivebuffer)) {
+        pReceivebuffer = 0;
+		byteArrayIndex = 0;
+    }
+}
+	
+
 void analyzediff(void){
-	unsigned char byteArray[4];		//Array vom ADC
-	byteArray[0] = 0b11110110;
-	byteArray[1] = 0b00101000;
-	byteArray[2] = 0b00010110;
-	byteArray[3] = 0b01000010;
+	
 	//Schleife erstellen für die Grosse von unserem Paket: Im Testfall sind es 58 Elemente
 	//Nach schleife den Sync Modus wieder starten.
 	switch(Offset){ // Startwert ist 3
@@ -376,6 +408,7 @@ void analyzediff(void){
 	k++;
 	switch(k){
 		case 32: //Wert noch anpassen working 62
+		getDataTemp();
 		k = 0;
 		for (size_t i = 0; i < (NR_OF_SAMPLES-4); i++) {
 			calculatedChecksum += receivebuffer[i];
