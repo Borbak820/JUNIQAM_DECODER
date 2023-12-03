@@ -77,8 +77,10 @@ uint8_t debug = 0;
 uint8_t symbol = 0;
 uint8_t checksumGL = 0; // Initialisierung der Checksumme
 uint8_t calculatedChecksum = 0; // Variable für die berechnete Checksumme
-float reconstructedFloat;
+unsigned char lenghtArray[4];
+uint8_t datalenght;
 unsigned char byteArray[4];
+float reconstructedFloat;
 
 /*Pointer Init*/
 uint16_t * p_Writing = &ringbuffer[0];
@@ -298,6 +300,39 @@ void vQuamDec(void* pvParameters)
 	}
 }
 
+
+void getDatalength(void) {
+    static int pReceivebuffer = 8;
+    static int lenghtArrayIndex = 0;
+
+    for (int i = 0; i < 4; i++) {
+        switch (receivebuffer[pReceivebuffer]) {
+            case 0:
+                lenghtArray[lenghtArrayIndex] |= (0b000 << (i % 4) * 2);
+                break;
+            case 1:
+                lenghtArray[lenghtArrayIndex] |= (0b001 << (i % 4) * 2);
+                break;
+            case 2:
+                lenghtArray[lenghtArrayIndex] |= (0b010 << (i % 4) * 2);
+                break;
+            case 3:
+                lenghtArray[lenghtArrayIndex] |= (0b100 << (i % 4) * 2);
+                break;
+        }
+        pReceivebuffer++;
+    }
+
+    memcpy(&datalenght, lenghtArray, sizeof(uint8_t));
+
+    // Zurücksetzen von pReceivebuffer und byteArrayIndex, wenn es am Ende des receivebuffer angelangt ist
+    if (pReceivebuffer >=11) {
+        pReceivebuffer = 8;
+        lenghtArrayIndex = 0;
+    }
+}
+
+
 void getDataTemp(void) {
 	static int pReceivebuffer = 12;
 	static int byteArrayIndex = 0;
@@ -320,12 +355,12 @@ void getDataTemp(void) {
         pReceivebuffer++;
 
         // Wenn viermal ins byteArray[0] geschrieben wurde, gehe zum nächsten Element
-        if ((i + 1) % 4 == 0) {
+        if ((i + 1) % datalenght == 0) {
             byteArrayIndex++;
         }
     }
 
-    // Zurücksetzen von pReceivebuffer, wenn es am Ende des receivebuffer angelangt ist
+    // Zurücksetzen von pReceivebuffer und byteArrayIndex, wenn es am Ende des receivebuffer angelangt ist
     if (pReceivebuffer >= sizeof(receivebuffer)) {
         pReceivebuffer = 0;
 		byteArrayIndex = 0;
@@ -408,6 +443,7 @@ void analyzediff(void){
 	k++;
 	switch(k){
 		case 32: //Wert noch anpassen working 62
+		getDatalength();
 		getDataTemp();
 		k = 0;
 		for (size_t i = 0; i < (NR_OF_SAMPLES-4); i++) {
