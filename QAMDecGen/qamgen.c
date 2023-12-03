@@ -52,7 +52,7 @@ void printBinary(unsigned char byte) {
 }
 
 int createBinary() {
-	float floatValue = 130;      //float vom Temp.-Sensor		Range: -127.99999°C <= x <= -2°C & x = 0°C & 2°C <= x <= 127.99999°C	weil das erste Bit fürs Vorzeichen ist.
+	float floatValue = 34.75;      //float vom Temp.-Sensor		Range: -127.99999°C <= x <= -2°C & x = 0°C & 2°C <= x <= 127.99999°C	weil das erste Bit fürs Vorzeichen ist.
 	
 	if (floatValue <= -127.99999) {
         floatValue = -127.99999;
@@ -74,12 +74,6 @@ int createBinary() {
 	for (int i = 0; i < sizeof(float); ++i) {
 		byteArray[i] = *(ptr + i);
 	}
-
-	// 	// Ausgabe des Original-Float-Werts
-	// 	printf("Float-Wert: %f\n", floatValue);
-	//
-	// 	// Ausgabe der Repräsentation des 4-Byte-Arrays in binärer Form
-	// 	printf("Byte-Array-Repraaesentation (binaer): ");
 	for (int i = 0; i < sizeof(float); ++i) {
 		printBinary(byteArray[i]);
 	}
@@ -92,7 +86,7 @@ void createSendData() { //0 -> 3 & 3-> 0 sind Idel Task (createideldata)
 	for (int i = 0; i < 4; i++) {
 		senddata[i] = (char)byteArray[i];
 	}
-	uint8_t datalen = 4;
+	uint8_t datalen = 4;	//Muss durch 4 teilbar sein
 	/*Header Start*/
 	sendbuffer[0] = 0;
 	sendbuffer[1] = 3;
