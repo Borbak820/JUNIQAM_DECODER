@@ -52,7 +52,20 @@ void printBinary(unsigned char byte) {
 }
 
 int createBinary() {
-	float floatValue = 37.54;      //float vom Temp.-Sensor
+	float floatValue = 130;      //float vom Temp.-Sensor		Range: -127.99999°C <= x <= -2°C & x = 0°C & 2°C <= x <= 127.99999°C	weil das erste Bit fürs Vorzeichen ist.
+	
+	if (floatValue <= -127.99999) {
+        floatValue = -127.99999;
+	} 
+	else if (floatValue > -1.99999 && floatValue < 0.00000) {
+		floatValue = -2.0;
+    } 
+	else if (floatValue < 1.99999 && floatValue > 0.00000) {
+		floatValue = 2.0;
+    } 
+	else if (floatValue >= 127.99999) {
+        floatValue = 127.99999;
+    }
 
 	// Verwendung eines Zeigers und Typumwandlung, um float in 4-Byte-Array zu konvertieren
 	unsigned char *ptr = (unsigned char*)&floatValue;
@@ -95,10 +108,10 @@ void createSendData() { //0 -> 3 & 3-> 0 sind Idel Task (createideldata)
 	sendbuffer[11] = (datalen >> 6) & 0x03;
 	/*Header END*/
 	for(int i = 0; i < datalen;i++) {
-		sendbuffer[12 + i*4 + 3] = (senddata[i] >> 0) & 0x03; //12 steht für die Grösse vom Header
-		sendbuffer[12 + i*4 + 2] = (senddata[i] >> 2) & 0x03;	// Reihenfolge +n vom sendbuffer geändert wegen LIFO
-		sendbuffer[12 + i*4 + 1] = (senddata[i] >> 4) & 0x03;
-		sendbuffer[12 + i*4 + 0] = (senddata[i] >> 6) & 0x03;
+		sendbuffer[12 + i*4 + 0] = (senddata[i] >> 0) & 0x03; //12 steht für die Grösse vom Header
+		sendbuffer[12 + i*4 + 1] = (senddata[i] >> 2) & 0x03;	// Reihenfolge +n vom sendbuffer geändert wegen LIFO
+		sendbuffer[12 + i*4 + 2] = (senddata[i] >> 4) & 0x03;
+		sendbuffer[12 + i*4 + 3] = (senddata[i] >> 6) & 0x03;
 	} //K nur bis hier mitrechnen
 	uint8_t checksum = 0;
 	for(int i = 0; i < 12 + (datalen * 4); i++) {
