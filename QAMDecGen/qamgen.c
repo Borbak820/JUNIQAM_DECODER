@@ -43,17 +43,21 @@ const int16_t Impuls4[NR_OF_SAMPLES] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
 
 #define SENDBUFFER_SIZE 31
 
-unsigned char byteArray[4];		// Float-Daten als binary
+// Float-Daten als binary
+unsigned char byteArray[4];
 
 void printBinary(unsigned char byte) {
 	for (int i = 7; i >= 0; --i) {
-		printf("%u", (byte >> i) & 1);  // Hier verwenden wir %u für unsigned
+		//%u für unsigned, da der float schon signed ist
+		printf("%u", (byte >> i) & 1);  
 	}
 }
 
 int createBinary() {
-	float floatValue = 34.75;      //float vom Temp.-Sensor		Range: -127.99999°C <= x <= -2°C & x = 0°C & 2°C <= x <= 127.99999°C	weil das erste Bit fürs Vorzeichen ist.
+	//float vom Temp.-Sensor		
+	float floatValue = 34.75;      
 	
+	//Range: -127.99999°C <= x <= -2°C & x = 0°C & 2°C <= x <= 127.99999°C
 	if (floatValue <= -127.99999) {
         floatValue = -127.99999;
 	} 
@@ -80,13 +84,15 @@ int createBinary() {
 	return 0;
 }
 
-void createSendData() { //0 -> 3 & 3-> 0 sind Idel Task (createideldata)
-	sendID++;
+void createSendData() {
+	sendID ++;		//Muss sich das ändern?? MUSS durch 4 Teilbar sein, damit es korrekt funktioniert!!
 	char senddata[4];
 	for (int i = 0; i < 4; i++) {
 		senddata[i] = (char)byteArray[i];
 	}
-	uint8_t datalen = 4;	//Muss durch 4 teilbar sein
+	//datalen muss durch 4 teilbar sein
+	uint8_t datalen = 4;
+	
 	/*Header Start*/
 	sendbuffer[0] = 0;
 	sendbuffer[1] = 3;
@@ -102,16 +108,18 @@ void createSendData() { //0 -> 3 & 3-> 0 sind Idel Task (createideldata)
 	sendbuffer[11] = (datalen >> 6) & 0x03;
 	/*Header END*/
 	for(int i = 0; i < datalen;i++) {
-		sendbuffer[12 + i*4 + 0] = (senddata[i] >> 0) & 0x03; //12 steht für die Grösse vom Header
-		sendbuffer[12 + i*4 + 1] = (senddata[i] >> 2) & 0x03;	// Reihenfolge +n vom sendbuffer geändert wegen LIFO
+		//12 steht für die Grösse vom Header
+		sendbuffer[12 + i*4 + 0] = (senddata[i] >> 0) & 0x03;
+		sendbuffer[12 + i*4 + 1] = (senddata[i] >> 2) & 0x03;
 		sendbuffer[12 + i*4 + 2] = (senddata[i] >> 4) & 0x03;
 		sendbuffer[12 + i*4 + 3] = (senddata[i] >> 6) & 0x03;
-	} //K nur bis hier mitrechnen
+	}
 	uint8_t checksum = 0;
 	for(int i = 0; i < 12 + (datalen * 4); i++) {
 		checksum += sendbuffer[i];
 	}
-	sendbuffer[12 + (datalen * 4) + 0] = 0;  //Die Checksume wird auf 2bit Paare aufgeteilt
+	//Die Checksume wird auf 2bit Paare aufgeteilt
+	sendbuffer[12 + (datalen * 4) + 0] = 0;  
 	sendbuffer[12 + (datalen * 4) + 1] = 1;
 	sendbuffer[12 + (datalen * 4) + 2] = 2;
 	sendbuffer[12 + (datalen * 4) + 3] = 3;
@@ -132,8 +140,8 @@ void vQuamGen(void *pvParameters) {
 		else{
 			BinaryCounter --;
 		}
-		switch(debug_gen)
-		{case 3: // Nur Für Testzwecke ChaosData! Kann später von 3 zu 0 getauscht werden
+		switch(debug_gen){
+			case 3: // Nur Für Testzwecke ChaosData! Kann später von 3 zu 0 getauscht werden
 				createSendData();
 				debug_gen = 1;
 				break;
@@ -170,7 +178,7 @@ void fillBuffer(uint16_t buffer[NR_OF_SAMPLES]) {
 	switch (sendbuffer[0])
 	{
 		case 4:
-		return; //für Erstellung Idel Senddata :)
+		return; //für Erstellung Idle Senddata :)
 		break;
 	}
 	
@@ -212,16 +220,12 @@ void fillBuffer(uint16_t buffer[NR_OF_SAMPLES]) {
 	}
 }
 
-ISR(DMA_CH0_vect)
-{
-	//static signed BaseType_t test;
-	
+ISR(DMA_CH0_vect){
 	DMA.CH0.CTRLB|=0x10;
 	fillBuffer(&dacBuffer0[0]);
 }
 
-ISR(DMA_CH1_vect)
-{
+ISR(DMA_CH1_vect){
 	DMA.CH1.CTRLB|=0x10;
 	fillBuffer(&dacBuffer1[0]);
 }
