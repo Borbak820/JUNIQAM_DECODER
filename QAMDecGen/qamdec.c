@@ -328,6 +328,7 @@ void getDataSendID(void) {
 void getDatalength(void) {
     static int pReceivebuffer = 8;
     static int lenghtArrayIndex = 0;
+	memcpy(&lenghtArray, 0, sizeof(uint8_t));	//Array leeren
 
     for (int i = 0; i < 4; i++) {
         switch (receivebuffer[pReceivebuffer]) {
