@@ -25,6 +25,7 @@
 #include "qaminit.h"
 #include "qamdec.h"
 #include "string.h"
+#include "stdio.h"
 /*Defines*/
 #define quarterjump1 7
 #define quarterjump2 8 //Perfekt für Sync Weil diese Sprünge nur in einem Fall auftreten können 3 -> 0
@@ -497,7 +498,6 @@ void analyzediff(void){
 		}
 		if (calculatedChecksum == checksumGL) {
 			memcpy(&reconstructedFloat, byteArray, sizeof(float));
-			
 		}
 		
 		for (int i = 0; i < 32; i++) {

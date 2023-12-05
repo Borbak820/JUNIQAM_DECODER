@@ -11,6 +11,4 @@
 
 void vQuamDec(void* pvParameters);
 
-
-
 #endif /* QAMDEC_H_ */
