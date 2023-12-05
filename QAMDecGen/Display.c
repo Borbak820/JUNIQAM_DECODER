@@ -33,6 +33,5 @@ void vDisplay(void* pvParameters){
 	vDisplayWriteStringAtPos(1,0, "%f", reconstructedFloat);
 	vDisplayWriteStringAtPos(2,0, "%f", reconstructedFloat);
 	vDisplayWriteStringAtPos(3,0,"ResetReason: %d", reason);
-	printf("Wert der globalen float-Variable in file1.c: %f\n", reconstructedFloat);
 	vTaskDelay(1000/portTICK_RATE_MS);
 }

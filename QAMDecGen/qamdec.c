@@ -81,7 +81,7 @@ uint8_t SendID;
 unsigned char lenghtArray[4];
 uint8_t datalenght;
 unsigned char byteArray[4];
-float reconstructedFloat;
+extern float reconstructedFloat;
 
 /*Pointer Init*/
 uint16_t * p_Writing = &ringbuffer[0];

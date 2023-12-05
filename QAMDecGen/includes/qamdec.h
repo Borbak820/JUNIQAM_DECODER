@@ -9,6 +9,8 @@
 #ifndef QAMDEC_H_
 #define QAMDEC_H_
 
+float reconstructedFloat;
+
 void vQuamDec(void* pvParameters);
 
 #endif /* QAMDEC_H_ */
