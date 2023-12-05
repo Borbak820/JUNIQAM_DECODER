@@ -29,12 +29,10 @@
 #include "qaminit.h"
 #include "qamgen.h"
 #include "qamdec.h"
+#include "Display.h"
 
 
 extern void vApplicationIdleHook( void );
-void vLedBlink(void *pvParameters);
-
-TaskHandle_t ledTask;
 
 void vApplicationIdleHook( void )
 {	
@@ -43,8 +41,6 @@ void vApplicationIdleHook( void )
 
 int main(void)
 {
-	resetReason_t reason = getResetReason();
-
 	vInitClock();
 	vInitDisplay();
 	
@@ -57,12 +53,8 @@ int main(void)
 	
 	xTaskCreate(vQuamGen, NULL, configMINIMAL_STACK_SIZE+500, NULL, 2, NULL);
 	xTaskCreate(vQuamDec, NULL, configMINIMAL_STACK_SIZE+400, NULL, 1, NULL);
+	xTaskCreate(vDisplay, NULL, configMINIMAL_STACK_SIZE+100, NULL, 3, NULL);
 
-	vDisplayClear();
-	vDisplayWriteStringAtPos(0,0,"FreeRTOS 10.0.1");
-	vDisplayWriteStringAtPos(1,0,"EDUBoard 1.0");
-	vDisplayWriteStringAtPos(2,0,"QAMDECGEN-Base");
-	vDisplayWriteStringAtPos(3,0,"ResetReason: %d", reason);
 	vTaskStartScheduler();
 	return 0;
 }
