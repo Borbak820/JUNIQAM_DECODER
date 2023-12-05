@@ -81,7 +81,7 @@ uint8_t SendID;
 unsigned char lenghtArray[4];
 uint8_t datalenght;
 unsigned char byteArray[4];
-extern float reconstructedFloat;
+float reconstructedFloat;
 
 /*Pointer Init*/
 uint16_t * p_Writing = &ringbuffer[0];
@@ -496,8 +496,9 @@ void analyzediff(void){
 				break;
 			}
 		}
-		if (calculatedChecksum == checksumGL) {
+		if (calculatedChecksum == checksumGL) { //MUTEX!!
 			memcpy(&reconstructedFloat, byteArray, sizeof(float));
+			getReconstructedFloat();
 		}
 		
 		for (int i = 0; i < 32; i++) {
@@ -519,6 +520,13 @@ void analyzediff(void){
 	}
 	
 }
+
+
+float getReconstructedFloat() {	//Mutex!!
+	float TempData = reconstructedFloat;
+	return TempData;
+}
+
 
 void fillDecoderQueue(uint16_t buffer[NR_OF_SAMPLES]) {
 	BaseType_t xTaskWokenByReceive = pdFALSE;
