@@ -496,7 +496,7 @@ void analyzediff(void){
 				break;
 			}
 		}
-		if (calculatedChecksum == checksumGL) { //MUTEX!!
+		if (calculatedChecksum == checksumGL) { //MUTEX notwendig? da getter-Funktion erst nach dem schreiben aufgerufen wird!
 			memcpy(&reconstructedFloat, byteArray, sizeof(float));
 			getReconstructedFloat();
 		}
@@ -522,7 +522,7 @@ void analyzediff(void){
 }
 
 
-float getReconstructedFloat() {	//Mutex!!
+float getReconstructedFloat() {	//Mutex??
 	float TempData = reconstructedFloat;
 	return TempData;
 }
