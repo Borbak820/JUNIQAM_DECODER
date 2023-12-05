@@ -1,3 +1,11 @@
+/*
+* Display.c
+*
+* Created: 05.12.2023 16:38:25
+*  Author: Borbak820
+*/
+
+
 #include "avr_compiler.h"
 #include "pmic_driver.h"
 #include "TC_driver.h"
@@ -28,10 +36,11 @@
 void vDisplay(void* pvParameters){
 	
 	resetReason_t reason = getResetReason();
-	vDisplayClear();
-	vDisplayWriteStringAtPos(0,0, "%f", reconstructedFloat);
-	vDisplayWriteStringAtPos(1,0, "%f", reconstructedFloat);
-	vDisplayWriteStringAtPos(2,0, "%f", reconstructedFloat);
-	vDisplayWriteStringAtPos(3,0,"ResetReason: %d", reason);
-	vTaskDelay(1000/portTICK_RATE_MS);
+	for (;;) {
+		float Temp = getReconstructedFloat();
+		vDisplayClear();
+		vDisplayWriteStringAtPos(0,0, "%f 'C", Temp);
+		vDisplayWriteStringAtPos(3,0,"ResetReason: %d", reason);
+		vTaskDelay(1000/portTICK_RATE_MS);
+	}
 }
