@@ -85,7 +85,7 @@ int createBinary() {
 }
 
 void createSendData() {
-	sendID ++;		//Muss sich das ändern?? MUSS durch 4 Teilbar sein, damit es korrekt funktioniert!!
+	sendID = 16;			//MUSS durch 4 Teilbar sein, damit es korrekt funktioniert!!
 	char senddata[4];
 	for (int i = 0; i < 4; i++) {
 		senddata[i] = (char)byteArray[i];
