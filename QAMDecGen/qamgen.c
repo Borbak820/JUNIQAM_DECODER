@@ -113,10 +113,10 @@ void createSendData() { //0 -> 3 & 3-> 0 sind Idel Task (createideldata)
 	for(int i = 0; i < 12 + (datalen * 4); i++) {
 		checksum += sendbuffer[i];
 	}
-	sendbuffer[12 + (datalen * 4) + 0] = 0;  //Die Checksume wird auf 2bit Paare aufgeteilt
-	sendbuffer[12 + (datalen * 4) + 1] = 1;
-	sendbuffer[12 + (datalen * 4) + 2] = 2;
-	sendbuffer[12 + (datalen * 4) + 3] = 3;
+	sendbuffer[12 + (datalen * 4) + 0] = (checksum >> 0) & 0x03;  //Die Checksume wird auf 2bit Paare aufgeteilt
+	sendbuffer[12 + (datalen * 4) + 1] = (checksum >> 2) & 0x03;
+	sendbuffer[12 + (datalen * 4) + 2] = (checksum >> 4) & 0x03;
+	sendbuffer[12 + (datalen * 4) + 3] = (checksum >> 6) & 0x03;
 }
 
 void vQuamGen(void *pvParameters) {

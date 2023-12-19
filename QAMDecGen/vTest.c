@@ -110,6 +110,7 @@ uint8_t checksumGL = 0; // Initialisierung der Checksumme
 uint8_t calculatedChecksum = 0; // Variable f�r die berechnete Checksumme
 float reconstructedFloat = 0; // Nicht Best Practise Provisorium!!
 uint8_t debug = 0;
+unsigned char CSArray[4];
 
 
 //  	uint16_t ringbuffer[256] = { //IDEL STREAM 030303
@@ -404,6 +405,36 @@ void getDataTemp(void) {
 	}
 }
 
+void getChecksum(void) {
+	static int pReceivebuffer = 28;
+	static int CSArrayIndex = 0;
+	memcpy(&CSArray, 0, sizeof(uint8_t));	//Array leeren
+
+	for (int i = 0; i < 4; i++) {
+		switch (receivebuffer[pReceivebuffer]) {
+			case 0:
+			CSArray[CSArrayIndex] |= (0b000 << (i % 4) * 2);
+			break;
+			case 1:
+			CSArray[CSArrayIndex] |= (0b001 << (i % 4) * 2);
+			break;
+			case 2:
+			CSArray[CSArrayIndex] |= (0b010 << (i % 4) * 2);
+			break;
+			case 3:
+			CSArray[CSArrayIndex] |= (0b100 << (i % 4) * 2);
+			break;
+		}
+		pReceivebuffer++;
+	}
+	memcpy(&checksumGL, CSArray, sizeof(uint8_t));
+	// Zurücksetzen von pReceivebuffer und byteArrayIndex, wenn es am Ende des receivebuffer angelangt ist
+	if (pReceivebuffer >=32) {
+		pReceivebuffer = 28;
+		CSArrayIndex = 0;
+	}
+}
+
 void vTest(void *pvParameters){
 	uint32_t read_pos = 0;
 	int16_t pos = 0;
@@ -504,31 +535,16 @@ void vTest(void *pvParameters){
 					}
 					break;
 				case checksum:
+					calculatedChecksum = 0;
 					for (size_t i = 0; i < (NR_OF_SAMPLES-4); i++) { /*CODE CHECKING FOR REALISTIC?*/
 						calculatedChecksum += receivebuffer[i];
 					}
 					for (int z = 0; z < NR_OF_SAMPLES-4; z++){
 						symbol = receivebuffer[z]; // Generiert das Signal entsprechend der Zeit seit dem letzten "Peak"-Signal
 						// Decodiere das Symbol
-						switch (symbol){
-							case 0:
-							checksumGL += receivebuffer[z];
-							break;
-							case 1:
-							checksumGL += receivebuffer[z];
-							break;
-							case 2:
-							checksumGL += receivebuffer[z];
-							break;
-							case 3:
-							checksumGL += receivebuffer[z];
-							break;
-							default:
-							// Auf Dispaly "Unknown symbol received!"
-							break;
-						}
+						getChecksum();
 					}
-					if ((receivebuffer[28] == 0) && (receivebuffer[29] == 1) && (receivebuffer[30] == 2) && (receivebuffer[31] == 3))
+					if (checksumGL == calculatedChecksum)
 					{
 						protocolmode = FINAL;
 						getDataTemp();
