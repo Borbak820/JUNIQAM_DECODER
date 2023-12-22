@@ -90,14 +90,14 @@ void createSendData() { //0 -> 3 & 3-> 0 sind Idel Task (createideldata)
 	}
 	uint8_t datalen = 4;
 	/*Header Start*/
-	sendbuffer[0] = 0;
-	sendbuffer[1] = 2;
-	sendbuffer[2] = 0;
-	sendbuffer[3] = 2;
-	sendbuffer[4] = (sendID >> 0) & 0x03;
-	sendbuffer[5] = (sendID >> 2) & 0x03;
-	sendbuffer[6] = (sendID >> 4) & 0x03;
-	sendbuffer[7] = (sendID >> 6) & 0x03;
+	sendbuffer[0] = 3;
+	sendbuffer[1] = 0;
+	sendbuffer[2] = 3;
+	sendbuffer[3] = 0;
+	sendbuffer[4] = 3;
+	sendbuffer[5] = 2;
+	sendbuffer[6] = 0;
+	sendbuffer[7] = 1;
 	sendbuffer[8] = (datalen >> 0) & 0x03;
 	sendbuffer[9] = (datalen >> 2) & 0x03;
 	sendbuffer[10] = (datalen >> 4) & 0x03;
@@ -140,7 +140,7 @@ void vQuamGen(void *pvParameters) {
 					for (int i = 0; i < 32; i = ++i)
 					{
 						sendbuffer[i] = 0;
-						sendbuffer[++i] = 3;
+						sendbuffer[++i] = 0;
 					}
 				debug_gen = 1;
 				break;

@@ -36,6 +36,10 @@
 #define Data 4
 #define checksum 5
 #define FINAL 6
+#define Idel2 7
+#define Idel3 8
+#define Idel4 9
+#define Idel5 10
 
 
 #define quarterjump1 7
@@ -422,7 +426,7 @@ void getChecksum(void) {
 			CSArray[CSArrayIndex] |= (0b010 << (i % 4) * 2);
 			break;
 			case 3:
-			CSArray[CSArrayIndex] |= (0b100 << (i % 4) * 2);
+			CSArray[CSArrayIndex] |= (0b11 << (i % 4) * 2);
 			break;
 		}
 		pReceivebuffer++;
@@ -488,19 +492,54 @@ void vTest(void *pvParameters){
 			}
 			switch(protocolmode){ //Sinnvoll hier das mit dem Receivbuffer zu machen?
 				case Idel0:
-					if (currentnumber == 0)
+					if (currentnumber == 3)
 					{
 						protocolmode = Idel1;
 					}
 					break;
 				case Idel1:
+					if (currentnumber == 0)
+					{
+						protocolmode = Idel2;
+					}else
+					{
+						protocolmode = Idel0;						
+					}
+					break;
+				case Idel2:
+					if (currentnumber == 3)
+					{
+						protocolmode = Idel3;
+					}else
+					{
+						protocolmode = Idel0;						
+					}
+					break;
+				case Idel3:
+					if (currentnumber == 0)
+					{
+						protocolmode = Idel4;
+					}else
+					{
+						protocolmode = Idel0;						
+					}
+					break;
+				case Idel4:
+					if (currentnumber == 3)
+					{
+						protocolmode = Idel5;
+					}else
+					{
+						protocolmode = Idel0;						
+					}
+					break;
+				case Idel5:
 					if (currentnumber == 2)
 					{
 						protocolmode = type;
-					}
-					if (currentnumber == 3)
+					}else
 					{
-						protocolmode = Idel0;
+						protocolmode = Idel0;						
 					}
 					break;
 				case type:
@@ -513,14 +552,18 @@ void vTest(void *pvParameters){
 					}
 					break;
 				case sync:
-					if (currentnumber == 2)
+					if (currentnumber == 1)
 					{
-						RX_Pos = 4;
+						RX_Pos =8;
 						debug = 1;
-						receivebuffer[0] = 0;
-						receivebuffer[1] = 2;
-						receivebuffer[2] = 0;
-						receivebuffer[3] = 2;
+						receivebuffer[0] = 3;
+						receivebuffer[1] = 0;
+						receivebuffer[2] = 3;
+						receivebuffer[3] = 0;
+						receivebuffer[4] = 3;
+						receivebuffer[5] = 2;
+						receivebuffer[6] = 0;
+						receivebuffer[7] = 1;
 						protocolmode = Data;
 					}else{
 						protocolmode = Idel0;
