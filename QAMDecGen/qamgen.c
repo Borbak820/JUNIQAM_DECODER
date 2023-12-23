@@ -148,7 +148,7 @@ void vQuamGen(void *pvParameters) {
 			/*        END OF SIMULATION                                             */
 			/************************************************************************/
 		}
-		if (new_time - old_time >= 500)
+		if (new_time - old_time >= 250)
 		{
 			 				readTempData();
 			 				temparatur =  getTemperatureData();
