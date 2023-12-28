@@ -329,14 +329,13 @@ int16_t getNextHighPos(uint32_t Pos){
 	for (int i = 0; i < 60; ++i)
 	{
 		Pos = Pos + 2;
-		if ((ringbuffer[Pos & BitMask] > 2000)) //Wert 2000 über Durchschnitt peak vom Idel Stream setzten!
-		{
+		if ((ringbuffer[Pos & BitMask] > 2000)) {//Wert 2000 über Durchschnitt peak vom Idel Stream setzten!
 			syncpos = (Pos & BitMask);
 			return syncpos;
-		}//if (ringbuffer[Pos & BitMask] < 50)
-// 		{
-// 			vTaskDelay(1/portTICK_RATE_MS);
-// 		}
+		}
+		if (ringbuffer[Pos & BitMask] < 50)	{
+			vTaskDelay(1/portTICK_RATE_MS);
+		}
 		
 	}
 	if (syncpos != -1)
