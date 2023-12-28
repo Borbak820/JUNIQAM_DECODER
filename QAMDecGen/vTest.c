@@ -117,31 +117,31 @@ uint8_t quarterjump(uint8_t lastnumber, uint8_t k){
 	uint8_t newnumber = 0;
 	receivebuffer[k] = 0;
 	return newnumber;
-// 	switch(lastnumber){
-// 		case 0:
-// 		receivebuffer[k] = 1;
-// 		newnumber = 1;
-// 		return newnumber;
-// 		break;
-// 		case 1:
-// 		receivebuffer[k] = 2;
-// 		newnumber = 2;
-// 		return newnumber;
-// 		break;
-// 		case 2:
-// 		receivebuffer[k] = 3;
-// 		newnumber = 3;
-// 		return newnumber;
-// 		break;
-// 		case 3:
-// 		receivebuffer[k] = 0;
-// 		newnumber = 0;
-// 		return newnumber;
-// 		break;
-// 		default:
-// 		return 4;
-// 		break;
-// 	}
+	switch(lastnumber){
+		case 0:
+		receivebuffer[k] = 1;
+		newnumber = 1;
+		return newnumber;
+		break;
+		case 1:
+		receivebuffer[k] = 2;
+		newnumber = 2;
+		return newnumber;
+		break;
+		case 2:
+		receivebuffer[k] = 3;
+		newnumber = 3;
+		return newnumber;
+		break;
+		case 3:
+		receivebuffer[k] = 0;
+		newnumber = 0;
+		return newnumber;
+		break;
+		default:
+		return 4;
+		break;
+	}
 }
 
 uint8_t halfjump(uint8_t lastnumber, uint8_t k){
