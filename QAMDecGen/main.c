@@ -49,19 +49,19 @@ int main(void)
 	vInitClock();
 	vInitDisplay();
 	
-// 	initDAC();
-// 	initDACTimer();
-// 	initGenDMA();
-	initADC();
-	initADCTimer();
-	initDecDMA();
+	initDAC();
+	initDACTimer();
+	initGenDMA();
+// 	initADC();
+// 	initADCTimer();
+// 	initDecDMA();
 	
 	LSM9DS1Init();
 	
-//	xTaskCreate(vQuamGen, NULL, configMINIMAL_STACK_SIZE+500, NULL, 2, NULL);
- 	xTaskCreate(vQuamDec, NULL, configMINIMAL_STACK_SIZE+200, NULL, 2, NULL);
-	xTaskCreate(vTest, NULL, configMINIMAL_STACK_SIZE+800, NULL, 1, NULL);
-  	xTaskCreate(vDisplay, NULL, configMINIMAL_STACK_SIZE+100, NULL, 3, NULL);
+	xTaskCreate(vQuamGen, NULL, configMINIMAL_STACK_SIZE+500, NULL, 2, NULL);
+//  	xTaskCreate(vQuamDec, NULL, configMINIMAL_STACK_SIZE+200, NULL, 2, NULL);
+// 	xTaskCreate(vTest, NULL, configMINIMAL_STACK_SIZE+800, NULL, 1, NULL);
+//   	xTaskCreate(vDisplay, NULL, configMINIMAL_STACK_SIZE+100, NULL, 3, NULL);
 
 	vDisplayClear();
 	vDisplayWriteStringAtPos(0,0,"FreeRTOS 10.0.1");

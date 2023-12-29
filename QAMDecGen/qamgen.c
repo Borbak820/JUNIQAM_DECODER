@@ -58,11 +58,7 @@ const int16_t Impuls4[NR_OF_SAMPLES] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
 
 unsigned char byteArray[4];		// Float-Daten als binary
 
-void printBinary(unsigned char byte) {
-	for (int i = 7; i >= 0; --i) {
-		byte = (byte >> i) & 1;
-	}
-}
+
 
 int createBinary() {
 	// Verwendung eines Zeigers und Typumwandlung, um float in 4-Byte-Array zu konvertieren
@@ -71,9 +67,6 @@ int createBinary() {
 	// Kopieren der Bytes von float in das Array
 	for (int i = 0; i < sizeof(float); ++i) {
 		byteArray[i] = *(ptr + i);
-	}
-	for (int i = 0; i < sizeof(float); ++i) {
-		printBinary(byteArray[i]);
 	}
 	return 0;
 }
@@ -146,7 +139,6 @@ void vQuamGen(void *pvParameters) {
 		if (new_time - old_time >= 250) {
 			readTempData();
 			temparatur =  getTemperatureData();
-			printBinary(byteArray[4]);
 			createBinary();
 			old_time = new_time;
 			Modus = DATA;
