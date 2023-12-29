@@ -29,17 +29,17 @@
 #include "main.h"
 
 #define BitMask 0x000000FF
-#define Idel0 0
-#define Idel1 1
+#define Idle0 0
+#define Idle1 1
 #define type 2
 #define sync 3
 #define Data 4
 #define checksum 5
 #define FINAL 6
-#define Idel2 7
-#define Idel3 8
-#define Idel4 9
-#define Idel5 10
+#define Idle2 7
+#define Idle3 8
+#define Idle4 9
+#define Idle5 10
 
 
 #define quarterjump1 7
@@ -329,7 +329,7 @@ int16_t getNextHighPos(uint32_t Pos){
 	for (int i = 0; i < 60; ++i)
 	{
 		Pos = Pos + 2;
-		if ((ringbuffer[Pos & BitMask] > 2000)) {//Wert 2000 über Durchschnitt peak vom Idel Stream setzten!
+		if ((ringbuffer[Pos & BitMask] > 2000)) {//Wert 2000 über Durchschnitt peak vom Idle Stream setzten!
 			syncpos = (Pos & BitMask);
 			return syncpos;
 		}
@@ -439,54 +439,54 @@ void vTest(void *pvParameters){
 				read_pos = nextpos-4;
 			}
 			switch(protocolmode){
-				case Idel0:
+				case Idle0:
 					if (currentnumber == 3) {
-						protocolmode = Idel1;
+						protocolmode = Idle1;
 					}
 					break;
 					
-				case Idel1:
+				case Idle1:
 					if (currentnumber == 0) {
-						protocolmode = Idel2;
+						protocolmode = Idle2;
 					}
 					else {
-						protocolmode = Idel0;						
+						protocolmode = Idle0;						
 					}
 					break;
 					
-				case Idel2:
+				case Idle2:
 					if (currentnumber == 3) {
-						protocolmode = Idel3;
+						protocolmode = Idle3;
 					}
 					else {
-						protocolmode = Idel0;						
+						protocolmode = Idle0;						
 					}
 					break;
 					
-				case Idel3:
+				case Idle3:
 					if (currentnumber == 0) {
-						protocolmode = Idel4;
+						protocolmode = Idle4;
 					}
 					else {
-						protocolmode = Idel0;						
+						protocolmode = Idle0;						
 					}
 					break;
 					
-				case Idel4:
+				case Idle4:
 					if (currentnumber == 3) {
-						protocolmode = Idel5;
+						protocolmode = Idle5;
 					}
 					else {
-						protocolmode = Idel0;						
+						protocolmode = Idle0;						
 					}
 					break;
 					
-				case Idel5:
+				case Idle5:
 					if (currentnumber == 2) {
 						protocolmode = type;
 					}
 					else {
-						protocolmode = Idel0;						
+						protocolmode = Idle0;						
 					}
 					break;
 					
@@ -495,7 +495,7 @@ void vTest(void *pvParameters){
 						protocolmode = sync;
 					}
 					else {
-						protocolmode = Idel0;						
+						protocolmode = Idle0;						
 					}
 					break;
 					
@@ -514,7 +514,7 @@ void vTest(void *pvParameters){
 						protocolmode = Data;
 					}
 					else {
-						protocolmode = Idel0;
+						protocolmode = Idle0;
 					}
 					break;
 					
@@ -545,12 +545,12 @@ void vTest(void *pvParameters){
 					}
 					else {
 						RX_Pos = 0;
-						protocolmode = Idel0;
+						protocolmode = Idle0;
 					}
 					break;
 					
 				case FINAL:
-						protocolmode = Idel0;
+						protocolmode = Idle0;
 						RX_Pos = 0;
 						break;
 			}
