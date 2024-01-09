@@ -30,18 +30,25 @@
 #include "Defines.h"
 
 
-
+/*Array Init*/
 unsigned char byteArray[4];
 
+/*Semaphore Init*/
 SemaphoreHandle_t xMutex = NULL;
+
+/*Var Init*/
 uint8_t receivebuffer[50];
 uint8_t k = 0;
 uint8_t checksumGL = 0; // Initialisierung der Checksumme
-uint8_t calculatedChecksum = 0; // Variable f�r die berechnete Checksumme
+uint8_t calculatedChecksum = 0; // Variable fuer die berechnete Checksumme
 float reconstructedFloat = 0;
 uint8_t debug = 0;
 unsigned char CSArray[4];
 
+
+//////////////////////////////////////////////////////////////////////////
+/*						Jumps fuer die Synchronisations					*/
+//////////////////////////////////////////////////////////////////////////
 
 uint8_t quarterjump(uint8_t lastnumber, uint8_t k){
 	uint8_t newnumber = 0;
@@ -253,13 +260,19 @@ uint8_t onethreequartersjump(uint8_t lastnumber, uint8_t k){
 
 uint8_t analyzediff(int16_t Pos, int16_t nextpos, uint8_t lastnumber, uint8_t k);
 
+
+
+//////////////////////////////////////////////////////////////////////////
+/*			Funktion für das Suchen der Peaks im Ringpuffer				*/
+//////////////////////////////////////////////////////////////////////////
+
 int16_t getNextHighPos(uint32_t Pos){
 	int16_t syncpos = -1;
 
 	for (int i = 0; i < 60; ++i)
 	{
 		Pos = Pos + 4;
-		if ((ringbuffer[Pos & BitMask] > 2000)) {//Wert 2000 über Durchschnitt peak vom Idle Stream setzten! Für Drahtlos auf 500!
+		if ((ringbuffer[Pos & BitMask] > 2000)) {	//2000 für Kabelgebunden / Für Drahtlos 500!
 			syncpos = (Pos & BitMask);
 			return syncpos;
 		}
@@ -275,6 +288,12 @@ int16_t getNextHighPos(uint32_t Pos){
 		return -1;
 	}
 }
+
+
+
+//////////////////////////////////////////////////////////////////////////
+/*			Funktion für das extrahieren der Temperaturdaten			*/
+//////////////////////////////////////////////////////////////////////////
 
 void getDataTemp(void) {
 	uint8_t datalenght = 4;
@@ -311,6 +330,12 @@ void getDataTemp(void) {
 	}
 }
 
+
+
+//////////////////////////////////////////////////////////////////////////
+/*				Funktion für das extrahieren der Checksumme				*/
+//////////////////////////////////////////////////////////////////////////
+
 void getChecksum(void) {
 	static int pReceivebuffer = 28;
 	static int CSArrayIndex = 0;
@@ -341,7 +366,13 @@ void getChecksum(void) {
 	}
 }
 
-void vTest(void *pvParameters){
+
+
+//////////////////////////////////////////////////////////////////////////
+/*				Funktion für das Protokoll-Handling						*/
+//////////////////////////////////////////////////////////////////////////
+
+void vAnalyze(void *pvParameters){
 	uint32_t read_pos = 0;
 	int16_t pos = 0;
 	int16_t nextpos = 0;
@@ -354,7 +385,7 @@ void vTest(void *pvParameters){
 	(void) pvParameters;
 	
 	for (;;) {
-		xSemaphoreTake(xMutex, portMAX_DELAY);
+		xSemaphoreTake(xMutex, portMAX_DELAY);	//Mutex für die Variabel write_pos!
 		if (((write_pos) - (read_pos)) >= 70 ) {
 			xSemaphoreGive(xMutex);
 			pos = getNextHighPos(read_pos);
@@ -362,14 +393,14 @@ void vTest(void *pvParameters){
 			currentnumber = analyzediff(pos, nextpos, lastnumber, RX_Pos);
 			RX_Pos++;
 			lastnumber = currentnumber;
-			if (nextpos == -1) {
+			if (nextpos == -1) {			// Falls wir kein neuen Peak finden konnten!
 				read_pos = pos-4;
 			}
 			else {
-				read_pos = nextpos-4;
+				read_pos = nextpos-4;		// Damit wir beim nächsten Durchlauf den letzten Peak wieder finden können
 			}
-			switch(protocolmode){
-				case Idle0:
+			switch(protocolmode){			// Hier wird unser Protocolhandling betrieben
+				case Idle0:					// Check ob das Startmuster stimmt
 					if (currentnumber == 3) {
 						protocolmode = Idle1;
 					}
@@ -430,7 +461,7 @@ void vTest(void *pvParameters){
 					break;
 					
 				case sync:
-					if (currentnumber == 1)	{
+					if (currentnumber == 1)	{		// Ab diesem Zeitpunkt sind wir uns Sicher dass wir den Start von einem Datenpaket gefunden haben.
 						RX_Pos =8;
 						debug = 1;
 						receivebuffer[0] = 3;
@@ -457,12 +488,12 @@ void vTest(void *pvParameters){
 					}
 					break;
 					
-				case checksum:
+				case checksum:		//Berechnet die Soll-Checksumme der Empfangenen Daten
 					calculatedChecksum = 0;
 					for (size_t i = 0; i < (NR_OF_SAMPLES-4); i++) {
 						calculatedChecksum += receivebuffer[i];
 					}
-					getChecksum();
+					getChecksum();	//Extrahiert die gesendete Checksumme
 					
 					if (checksumGL == calculatedChecksum) {
 						protocolmode = FINAL;
@@ -494,6 +525,11 @@ void vTest(void *pvParameters){
 }
 
 
+
+//////////////////////////////////////////////////////////////////////////
+/*		Funktion für die Analyse der Differenz von zwei Peaks			*/
+//////////////////////////////////////////////////////////////////////////
+
 uint8_t analyzediff(int16_t Pos, int16_t nextpos, uint8_t number, uint8_t rxpos){
 	uint8_t Offset = 0;
 	
@@ -505,7 +541,7 @@ uint8_t analyzediff(int16_t Pos, int16_t nextpos, uint8_t number, uint8_t rxpos)
 		Offset = nextpos - Pos;
 	}
 	switch(Offset){
-		case quarterjump1: //Cases zusammenf�hren f�r weniger zeilen code!! case1:case2:case3: Code break;
+		case quarterjump1: 
 		newnumber = quarterjump(number, rxpos); 
 		break;
 		case quarterjump2:
@@ -659,11 +695,17 @@ uint8_t analyzediff(int16_t Pos, int16_t nextpos, uint8_t number, uint8_t rxpos)
 		newnumber = onethreequartersjump(number, rxpos);
 		break;
 		default:
-		//Code für Resett einbauen
 		break;
 	}
 	return newnumber;
 }
+
+
+
+//////////////////////////////////////////////////////////////////////////	
+/*							Diplay-Task									*/
+//////////////////////////////////////////////////////////////////////////
+
 void vDisplay(void* pvParameters){
 	for (;;) {
 		vDisplayClear();
