@@ -36,10 +36,10 @@
 #define Data 4
 #define checksum 5
 #define FINAL 6
-#define Idle2 7
-#define Idle3 8
-#define Idle4 9
-#define Idle5 10
+#define Idle2 60
+#define Idle3 61
+#define Idle4 62
+#define Idle5 63
 
 
 #define quarterjump1 7
@@ -328,8 +328,8 @@ int16_t getNextHighPos(uint32_t Pos){
 
 	for (int i = 0; i < 60; ++i)
 	{
-		Pos = Pos + 2;
-		if ((ringbuffer[Pos & BitMask] > 2000)) {//Wert 2000 über Durchschnitt peak vom Idle Stream setzten!
+		Pos = Pos + 4;
+		if ((ringbuffer[Pos & BitMask] > 2000)) {//Wert 2000 über Durchschnitt peak vom Idle Stream setzten! Für Drahtlos auf 500!
 			syncpos = (Pos & BitMask);
 			return syncpos;
 		}
@@ -519,7 +519,7 @@ void vTest(void *pvParameters){
 					break;
 					
 				case Data:
-					if(RX_Pos == 31){
+					if(RX_Pos == 32){
 						protocolmode = checksum;
 					}
 					else {
@@ -731,22 +731,6 @@ uint8_t analyzediff(int16_t Pos, int16_t nextpos, uint8_t number, uint8_t rxpos)
 		default:
 		//Code für Resett einbauen
 		break;
-	}
-	switch(rxpos){
-		case 32:
-		if (debug == 1) {
-			rxpos = 0;
-			if (calculatedChecksum == checksumGL) {
-				 //Schluss vom Analyze Teil
-				//CODE Für TEMP Auslesen!	
-			}
-	
-			debug = 0;
-			checksumGL = 0;
-		}
-		else{
-			break;
-		}
 	}
 	return newnumber;
 }

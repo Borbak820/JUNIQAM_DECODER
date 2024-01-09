@@ -81,7 +81,7 @@ void readTempData(void) {
     i2cRead(GYROACCADDRESS, OUT_TEMP_L, 2, temp);
     tempValue = (((int16_t) temp[1] << 12) | temp[0] << 4 ) >> 4;
     temperature *= 0.9;
-    temperature += ((float)tempValue / 16) + 25;
+    temperature += ((float)tempValue / 16) + 23;
 }
 
 int16_t getGyroData(int axis) {

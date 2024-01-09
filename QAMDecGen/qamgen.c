@@ -136,7 +136,7 @@ void vQuamGen(void *pvParameters) {
 			/*        END OF SIMULATION                                             */
 			/************************************************************************/
 		}
-		if (new_time - old_time >= 250) {
+		if (new_time - old_time >= 10) {
 			readTempData();
 			temparatur =  getTemperatureData();
 			createBinary();
