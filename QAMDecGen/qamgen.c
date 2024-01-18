@@ -29,8 +29,6 @@
 #include "string.h"
 
 #include "math.h"
-#include "LSM9DS1Defines.h"
-#include "LSM9DS1Driver.h"
 #include "twiMaster.h"
 
 #define IDLE 101
@@ -137,8 +135,7 @@ void vQuamGen(void *pvParameters) {
 			/************************************************************************/
 		}
 		if (new_time - old_time >= 10) {
-			readTempData();
-			temparatur =  getTemperatureData();
+			temparatur += temparatur;
 			createBinary();
 			old_time = new_time;
 			Modus = DATA;
