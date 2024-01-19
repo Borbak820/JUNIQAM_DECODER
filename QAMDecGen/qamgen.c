@@ -29,6 +29,8 @@
 #include "string.h"
 
 #include "math.h"
+#include "LSM9DS1Defines.h"
+#include "LSM9DS1Driver.h"
 #include "twiMaster.h"
 
 /*Defines*/
@@ -156,7 +158,8 @@ void vQuamGen(void *pvParameters) {
 				break;
 		}
 		if (new_time - old_time >= 10) {
-			temparatur += temparatur;
+			readTempData();
+			temparatur =  getTemperatureData();
 			createBinary();
 			old_time = new_time;
 			Modus = DATA;
